@@ -16,7 +16,7 @@ Compose Multiplatform实现的传分工具，支持Windows系统。
 ### QQ群（推荐）
 请到双端任一Q群内获取最新版本安装包。
 ### Github Release（更新较慢，不推荐）
-1. 下载Release中的msi文件
+1. 下载Release中的exe文件
 2. 安装
 3. 开始传分
 
