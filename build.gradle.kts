@@ -5,3 +5,13 @@ plugins {
     alias(libs.plugins.compose.compiler) apply false
     alias(libs.plugins.kotlinMultiplatform) apply false
 }
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath("com.guardsquare:proguard-gradle:7.1.0")
+    }
+}

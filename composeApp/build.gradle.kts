@@ -1,4 +1,5 @@
 import org.jetbrains.compose.compose
+import org.jetbrains.compose.desktop.application.dsl.JvmApplication
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
@@ -49,9 +50,19 @@ compose.desktop {
         mainClass = "MainKt"
 
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "org.nltv.chafenqi.updater"
+            targetFormats(TargetFormat.Dmg, TargetFormat.Exe, TargetFormat.Deb)
+            modules("java.instrument", "java.management", "jdk.unsupported")
+            packageName = "ChafenqiUpdater"
             packageVersion = "1.0.0"
+
+            windows {
+                dirChooser = true
+                iconFile.set(project.file("src/commonMain/composeResources/drawable/app_icon.png"))
+            }
+        }
+
+        buildTypes.release.proguard {
+            configurationFiles.from(project.file("proguard-rules.pro"))
         }
     }
 }
