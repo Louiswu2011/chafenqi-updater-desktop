@@ -1,6 +1,7 @@
 import org.jetbrains.compose.compose
 import org.jetbrains.compose.desktop.application.dsl.JvmApplication
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import java.util.UUID
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -52,12 +53,15 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Exe, TargetFormat.Deb)
             modules("java.instrument", "java.management", "jdk.unsupported")
-            packageName = "ChafenqiUpdater"
+            packageName = "Chafenqi Updater"
             packageVersion = "1.0.0"
 
             windows {
                 dirChooser = true
-                iconFile.set(project.file("src/commonMain/composeResources/drawable/app_icon.png"))
+                shortcut = true
+                iconFile.set(project.file("src/commonMain/composeResources/drawable/app_icon.ico"))
+                upgradeUuid = generateUUID(packageName ?: "Chafenqi Updater", packageVersion ?: "1.0.0")
+                menuGroup = "Chafenqi"
             }
         }
 
@@ -66,3 +70,5 @@ compose.desktop {
         }
     }
 }
+
+fun generateUUID(packageName: String, packageVersion: String) = UUID.nameUUIDFromBytes((packageName + packageVersion).toByteArray()).toString().uppercase()
