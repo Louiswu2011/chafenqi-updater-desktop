@@ -1,1 +1,7 @@
 -dontwarn okio.AsyncTimeout$Watchdog
+-keep class kotlinx.coroutines.internal.MainDispatcherFactory { *; }
+-keep class kotlinx.coroutines.swing.SwingDispatcherFactory { *; }
+-keep class io.ktor.serialization.kotlinx.json.KotlinxSerializationJsonExtensionProvider { *; }
+-keep class io.ktor.serialization.kotlinx.json.KotlinxSerializationJsonExtensionProvider { *; }
+-keep class kotlinx.serialization.SerialFormat { *; }
+-keep class org.slf4j.simple.SimpleServiceProvider { *; }
