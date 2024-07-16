@@ -1,5 +1,4 @@
 import org.jetbrains.compose.compose
-import org.jetbrains.compose.desktop.application.dsl.JvmApplication
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import java.util.UUID
 
@@ -55,6 +54,7 @@ compose.desktop {
             modules("java.instrument", "java.management", "jdk.unsupported")
             packageName = "Chafenqi Updater"
             packageVersion = "1.0.0"
+            vendor = "NLTV"
 
             windows {
                 dirChooser = true
