@@ -1,10 +1,25 @@
-This is a Kotlin Multiplatform project targeting Desktop.
+# 中二节奏/舞萌DX传分器
 
-* `/composeApp` is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-    - `commonMain` is for code that’s common for all targets.
-    - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-      For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-      `iosMain` would be the right folder for such calls.
+Compose Multiplatform实现的传分工具，支持Windows系统。
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
+[iOS端](https://github.com/Louiswu2011/chafenqi)
+
+[安卓端](https://github.com/Louiswu2011/chafenqi-android)
+
+## 主要功能
+- [x] 舞萌DX/中二节奏数据上传
+- [x] 设置/修改QQ绑定
+- [x] 设置/修改水鱼网账号绑定
+- [x] 数据同步上传到水鱼网
+
+## 使用方法
+### QQ群（推荐）
+请到双端任一Q群内获取最新版本安装包。
+### Github Release（更新较慢，不推荐）
+1. 下载Release中的msi文件
+2. 安装
+3. 开始传分
+
+## 编译项目
+1. Clone到本地
+2. Intellij IDEA打开编译
