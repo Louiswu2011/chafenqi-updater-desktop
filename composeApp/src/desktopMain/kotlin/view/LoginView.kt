@@ -195,5 +195,12 @@ fun LoginComponent(toaster: ToasterState) {
         ) {
             Text("登录")
         }
+        TextButton(
+            onClick = {
+
+            }
+        ) {
+            Text("注册新账号")
+        }
     }
 }

@@ -78,6 +78,10 @@ class LoginViewModel(
     fun loginWithCachedToken(username: String, token: String) {
         // Start login
         updatePrompt("登录中...")
+        if (username.isEmpty() || token.isEmpty()) {
+            raiseError("请输入用户名或密码")
+            return
+        }
         viewModelScope.launch {
             _loginState.update {
                 it.copy(
