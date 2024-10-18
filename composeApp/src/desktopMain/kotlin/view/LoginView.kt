@@ -65,7 +65,6 @@ fun LoginView() {
             val cache = model.fetchCachedCredentials()
             val cachedUsername = cache[0]
             val cachedToken = cache[1]
-            println(cache)
 
             if (cachedUsername.isNotEmpty() && cachedToken.isNotEmpty() && !appState.loggedOut) {
                 appState.loggedOut = false
@@ -218,7 +217,7 @@ fun LoginComponent(toaster: ToasterState) {
         }
         TextButton(
             onClick = {
-
+                toaster.show(message = "请使用iOS或Android客户端注册账号", type = ToastType.Info)
             }
         ) {
             Text("注册新账号")
