@@ -97,7 +97,7 @@ class LoginViewModel(
                         loginSuccess = true
                     )
                 }
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 raiseError("登录认证过期，请重新登录")
             }
 
@@ -147,7 +147,7 @@ class LoginViewModel(
 
         user.fishToken = try {
             CFQServer.fishFetchToken(user.token)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             println("User did not bind fish account.")
             ""
         }
@@ -155,7 +155,7 @@ class LoginViewModel(
 
         user.fishForward = try {
             CFQServer.apiFetchUserOption(user.token, "forwarding_fish") == "1"
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             println("User fish forward option failed to load, fallback to false")
             false
         }
@@ -163,7 +163,7 @@ class LoginViewModel(
 
         user.bindQQ = try {
             CFQServer.apiFetchUserOption(user.token, "bindQQ")
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             println("User did not bind qq.")
             ""
         }

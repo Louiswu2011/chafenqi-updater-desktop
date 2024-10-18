@@ -7,11 +7,6 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-data class AppSettings(
-    val cachedUsername: String = "",
-    val cachedToken: String = ""
-)
-
 class AppSettingsRepository(
     val dataStore: DataStore<Preferences>
 ) {

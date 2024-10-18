@@ -53,14 +53,14 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Exe, TargetFormat.Deb)
             modules("java.instrument", "java.management", "jdk.unsupported")
             packageName = "Chafenqi Updater"
-            packageVersion = "1.0.0"
+            packageVersion = "1.0.1"
             vendor = "NLTV"
 
             windows {
                 dirChooser = true
                 shortcut = true
                 iconFile.set(project.file("src/commonMain/composeResources/drawable/app_icon.ico"))
-                upgradeUuid = generateUUID(packageName ?: "Chafenqi Updater", packageVersion ?: "1.0.0")
+                upgradeUuid = generateUUID(packageName ?: "Chafenqi Updater", packageVersion ?: "1.0.1")
                 menuGroup = "Chafenqi"
             }
         }
