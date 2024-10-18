@@ -13,21 +13,28 @@ data class AppSettings(
 )
 
 class AppSettingsRepository(
-    private val dataStore: DataStore<Preferences>
+    val dataStore: DataStore<Preferences>
 ) {
     companion object {
         const val DEFAULT_CACHED_USERNAME = ""
         const val DEFAULT_CACHED_TOKEN = ""
     }
 
-    private val cachedUsernameKey = stringPreferencesKey("cachedUsername")
-    private val cachedTokenKey = stringPreferencesKey("cachedToken")
+    val cachedUsernameKey = stringPreferencesKey("cachedUsername")
+    val cachedTokenKey = stringPreferencesKey("cachedToken")
 
-    val settings: Flow<AppSettings> = dataStore.data.map {
-        AppSettings(
-            cachedUsername = it[cachedUsernameKey] ?: DEFAULT_CACHED_USERNAME,
-            cachedToken = it[cachedTokenKey] ?: DEFAULT_CACHED_TOKEN
-        )
+    val cachedUsername: Flow<String> =
+        dataStore.data.map { it[cachedUsernameKey] ?: DEFAULT_CACHED_USERNAME }
+
+    val cachedToken: Flow<String> =
+        dataStore.data.map { it[cachedTokenKey] ?: DEFAULT_CACHED_TOKEN }
+
+    suspend fun setCachedUsername(username: String) {
+        dataStore.edit { preferences -> preferences[cachedUsernameKey] = username }
+    }
+
+    suspend fun setCachedToken(token: String) {
+        dataStore.edit { preferences -> preferences[cachedTokenKey] = token }
     }
 
     suspend fun saveSettings(

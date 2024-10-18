@@ -27,6 +27,7 @@ import com.dokar.sonner.ToastType
 import com.dokar.sonner.Toaster
 import com.dokar.sonner.ToasterState
 import com.dokar.sonner.rememberToasterState
+import kotlinx.coroutines.launch
 import model.LoginViewModel
 import org.jetbrains.compose.resources.painterResource
 import user.LocalAppState
@@ -36,30 +37,35 @@ import util.sha256
 
 @Composable
 fun LoginView() {
+    val scope = rememberCoroutineScope()
     val repository = AppSettingsRepository(dataStore = LocalDataStore.current)
     val appState = LocalAppState.current
 
     val model: LoginViewModel = viewModel {
         LoginViewModel(repository)
     }
-    val settingsState by model.settings.collectAsState()
+
     val loginState by model.loginState.collectAsState()
     val toaster = rememberToasterState()
 
     LaunchedEffect(loginState.loginSuccess) {
         if (loginState.loginSuccess && !appState.isLoggedIn) {
             appState.isLoggedIn = true
-            appState.hasCache = true
             model.resetLoginState()
         }
     }
 
     LaunchedEffect(Unit) {
-        val cachedToken = settingsState?.cachedToken ?: ""
-        val cachedUsername = settingsState?.cachedUsername ?: ""
-        println("Cached credentials: [${cachedUsername}, ${cachedToken}]")
-        if (cachedUsername.isNotEmpty() && cachedToken.isNotEmpty() && appState.hasCache) {
-            model.loginWithCachedToken(cachedUsername, cachedToken)
+        scope.launch {
+            val cache = model.fetchCachedCredentials()
+            val cachedUsername = cache[0]
+            val cachedToken = cache[1]
+            println(cache)
+
+            if (cachedUsername.isNotEmpty() && cachedToken.isNotEmpty() && !appState.loggedOut) {
+                appState.loggedOut = false
+                model.loginWithCachedToken(cachedUsername, cachedToken)
+            }
         }
     }
 

@@ -12,13 +12,13 @@ import util.AppSettingsRepository
 class AppState : ViewModel() {
     var user = CFQUser
     var isLoggedIn by mutableStateOf(false)
-    var hasCache by mutableStateOf(false)
+    var loggedOut by mutableStateOf(false)
 
     suspend fun logout(repository: AppSettingsRepository) {
         CFQUser.token = ""
         CFQUser.username = ""
-        hasCache = false
         isLoggedIn = false
+        loggedOut = true
         removeUserProfile()
         resetCredentialsCache(repository)
     }
@@ -32,7 +32,6 @@ class AppState : ViewModel() {
 
     private suspend fun resetCredentialsCache(repository: AppSettingsRepository) {
         repository.saveSettings("", "")
-        hasCache = false
     }
 }
 

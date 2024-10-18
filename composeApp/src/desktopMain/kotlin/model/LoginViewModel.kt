@@ -20,14 +20,6 @@ class LoginViewModel(
 ) : ViewModel() {
     val user = CFQUser
 
-    val settings: StateFlow<AppSettings?> = settingsRepository
-        .settings
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000L),
-            null
-        )
-
     private val _loginState = MutableStateFlow(LoginState())
     val loginState = _loginState.asStateFlow()
 
@@ -71,8 +63,16 @@ class LoginViewModel(
         }
     }
 
+    suspend fun fetchCachedCredentials(): List<String> {
+        return listOf(
+            settingsRepository.cachedUsername.first(),
+            settingsRepository.cachedToken.first()
+        )
+    }
+
     private fun saveCredentialsToCache(username: String, token: String) = viewModelScope.launch {
-        settingsRepository.saveSettings(username, token)
+        settingsRepository.setCachedUsername(username)
+        settingsRepository.setCachedToken(token)
     }
 
     fun loginWithCachedToken(username: String, token: String) {
