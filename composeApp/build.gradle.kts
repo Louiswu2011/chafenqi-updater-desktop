@@ -8,7 +8,7 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
-val ktor_version = "2.3.12"
+val ktorVersion = "3.0.3"
 
 kotlin {
     jvm("desktop")
@@ -33,17 +33,16 @@ kotlin {
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(compose("org.jetbrains.kotlinx:kotlinx-coroutines-swing"))
-            implementation("io.ktor:ktor-client-core:$ktor_version")
-            implementation("io.ktor:ktor-client-cio:$ktor_version")
-            implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
-            implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
+            implementation("io.ktor:ktor-client-core:$ktorVersion")
+            implementation("io.ktor:ktor-client-cio:$ktorVersion")
+            implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+            implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
             implementation("org.slf4j:slf4j-api:2.0.9")
             implementation("org.slf4j:slf4j-simple:2.0.9")
             implementation("io.github.dokar3:sonner:0.3.8")
         }
     }
 }
-
 
 compose.desktop {
     application {
@@ -71,4 +70,7 @@ compose.desktop {
     }
 }
 
-fun generateUUID(packageName: String, packageVersion: String) = UUID.nameUUIDFromBytes((packageName + packageVersion).toByteArray()).toString().uppercase()
+fun generateUUID(
+    packageName: String,
+    packageVersion: String,
+) = UUID.nameUUIDFromBytes((packageName + packageVersion).toByteArray()).toString().uppercase()
