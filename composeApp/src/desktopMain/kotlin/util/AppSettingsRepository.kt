@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class AppSettingsRepository(
-    val dataStore: DataStore<Preferences>
+    val dataStore: DataStore<Preferences>,
 ) {
     companion object {
         const val DEFAULT_CACHED_USERNAME = ""
@@ -34,7 +34,7 @@ class AppSettingsRepository(
 
     suspend fun saveSettings(
         cachedUsername: String,
-        cachedToken: String
+        cachedToken: String,
     ) {
         dataStore.edit {
             it[cachedUsernameKey] = cachedUsername

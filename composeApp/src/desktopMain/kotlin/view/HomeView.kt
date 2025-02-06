@@ -84,37 +84,44 @@ fun HomeView() {
 
     Box {
         Spacer(
-            modifier = Modifier.fillMaxSize()
-                .background(color = Color.Transparent)
-                .drawBehind {
-                    drawCircle(
-                        color = color,
-                        radius = radius,
-                        center = Offset(size.width / 2f, size.height / 2f)
-                    )
-                }
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .background(color = Color.Transparent)
+                    .drawBehind {
+                        drawCircle(
+                            color = color,
+                            radius = radius,
+                            center = Offset(size.width / 2f, size.height / 2f),
+                        )
+                    },
         )
 
         Column(
-            modifier = Modifier.fillMaxSize()
-                .padding(all = 10.dp),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(all = 10.dp),
             verticalArrangement = Arrangement.SpaceBetween,
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 IconButton(onClick = { model.showHelpSheet = true }) {
                     Icon(imageVector = Icons.AutoMirrored.Outlined.Help, contentDescription = "help button")
                 }
-                Text(buildAnnotatedString {
-                    append("欢迎回来，")
-                    withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                        append(appState.user.username)
-                    }
-                }, maxLines = 1)
+                Text(
+                    buildAnnotatedString {
+                        append("欢迎回来，")
+                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                            append(appState.user.username)
+                        }
+                    },
+                    maxLines = 1,
+                )
                 IconButton(onClick = { model.showSettingsSheet = true }) {
                     Icon(imageVector = Icons.Outlined.Settings, contentDescription = "settings button")
                 }
@@ -122,7 +129,7 @@ fun HomeView() {
 
             Column(
                 verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Switch(checked = state.isProxyOn, onCheckedChange = {
                     model.toggleProxy(it)
@@ -132,7 +139,7 @@ fun HomeView() {
 
             Row(
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Button(onClick = { model.showCopyDialog = true }) {
                     Text("复制链接")

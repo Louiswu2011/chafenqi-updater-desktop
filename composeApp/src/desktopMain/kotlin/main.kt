@@ -21,33 +21,36 @@ import view.RootView
 const val PORTAL_ADDRESS = "http://43.139.107.206:8083/"
 const val GITHUB_PREFIX = "https://github.com/Louiswu2011/"
 
-fun main() = application {
-    val appState = AppState()
-    val windowState = rememberWindowState(
-        size = DpSize(width = 400.dp, height = 700.dp)
-    )
-    val dataStore: DataStore<Preferences> = PreferenceDataStoreFactory.createWithPath(
-        produceFile = {
-            "./cache.preferences_pb".toPath()
-        }
-    )
+fun main() =
+    application {
+        val appState = AppState()
+        val windowState =
+            rememberWindowState(
+                size = DpSize(width = 400.dp, height = 700.dp),
+            )
+        val dataStore: DataStore<Preferences> =
+            PreferenceDataStoreFactory.createWithPath(
+                produceFile = {
+                    "./cache.preferences_pb".toPath()
+                },
+            )
 
-    Window(
-        onCloseRequest = {
-            exitApplication()
-            CFQServer.onExit()
-        },
-        title = "查分器App传分工具",
-        state = windowState,
-        icon = painterResource(Res.drawable.app_icon),
-        resizable = false
-    ) {
-        CompositionLocalProvider(LocalAppState provides appState) {
-            CompositionLocalProvider(LocalDataStore provides dataStore) {
-                MaterialTheme {
-                    RootView()
+        Window(
+            onCloseRequest = {
+                exitApplication()
+                CFQServer.onExit()
+            },
+            title = "查分器App传分工具",
+            state = windowState,
+            icon = painterResource(Res.drawable.app_icon),
+            resizable = false,
+        ) {
+            CompositionLocalProvider(LocalAppState provides appState) {
+                CompositionLocalProvider(LocalDataStore provides dataStore) {
+                    MaterialTheme {
+                        RootView()
+                    }
                 }
             }
         }
     }
-}

@@ -12,24 +12,27 @@ data class LoginState(
     val errorText: String = "",
     val isLoggingIn: Boolean = false,
     val loginSuccess: Boolean = false,
-    val loginPrompt: String = ""
+    val loginPrompt: String = "",
 )
 
 class LoginViewModel(
-    private val settingsRepository: AppSettingsRepository
+    private val settingsRepository: AppSettingsRepository,
 ) : ViewModel() {
     val user = CFQUser
 
     private val _loginState = MutableStateFlow(LoginState())
     val loginState = _loginState.asStateFlow()
 
-    fun login(username: String, password: String) {
+    fun login(
+        username: String,
+        password: String,
+    ) {
         // Start login
         updatePrompt("登录中...")
         viewModelScope.launch {
             _loginState.update {
                 it.copy(
-                    isLoggingIn = true
+                    isLoggingIn = true,
                 )
             }
 
@@ -40,7 +43,7 @@ class LoginViewModel(
                 saveCredentialsToCache(username, CFQUser.token)
                 _loginState.update {
                     it.copy(
-                        loginSuccess = true
+                        loginSuccess = true,
                     )
                 }
             } catch (e: Exception) {
@@ -50,32 +53,37 @@ class LoginViewModel(
                     }
 
                     else -> {
-                        raiseError("未知错误：${e}")
+                        raiseError("未知错误：$e")
                     }
                 }
             }
 
             _loginState.update {
                 it.copy(
-                    isLoggingIn = false
+                    isLoggingIn = false,
                 )
             }
         }
     }
 
-    suspend fun fetchCachedCredentials(): List<String> {
-        return listOf(
+    suspend fun fetchCachedCredentials(): List<String> =
+        listOf(
             settingsRepository.cachedUsername.first(),
-            settingsRepository.cachedToken.first()
+            settingsRepository.cachedToken.first(),
         )
-    }
 
-    private fun saveCredentialsToCache(username: String, token: String) = viewModelScope.launch {
+    private fun saveCredentialsToCache(
+        username: String,
+        token: String,
+    ) = viewModelScope.launch {
         settingsRepository.setCachedUsername(username)
         settingsRepository.setCachedToken(token)
     }
 
-    fun loginWithCachedToken(username: String, token: String) {
+    fun loginWithCachedToken(
+        username: String,
+        token: String,
+    ) {
         // Start login
         updatePrompt("登录中...")
         if (username.isEmpty() || token.isEmpty()) {
@@ -85,7 +93,7 @@ class LoginViewModel(
         viewModelScope.launch {
             _loginState.update {
                 it.copy(
-                    isLoggingIn = true
+                    isLoggingIn = true,
                 )
             }
             try {
@@ -94,7 +102,7 @@ class LoginViewModel(
                 createUserProfile()
                 _loginState.update {
                     it.copy(
-                        loginSuccess = true
+                        loginSuccess = true,
                     )
                 }
             } catch (_: Exception) {
@@ -103,7 +111,7 @@ class LoginViewModel(
 
             _loginState.update {
                 it.copy(
-                    isLoggingIn = false
+                    isLoggingIn = false,
                 )
             }
         }
@@ -114,7 +122,7 @@ class LoginViewModel(
             _loginState.update {
                 it.copy(
                     isCredentialsMismatched = true,
-                    errorText = errorText
+                    errorText = errorText,
                 )
             }
         }
@@ -126,7 +134,7 @@ class LoginViewModel(
                 _loginState.update {
                     it.copy(
                         isCredentialsMismatched = false,
-                        errorText = ""
+                        errorText = "",
                     )
                 }
             }
@@ -145,28 +153,31 @@ class LoginViewModel(
         updatePrompt("加载用户数据...")
         user.isPremium = CFQServer.apiIsPremium(user.username)
 
-        user.fishToken = try {
-            CFQServer.fishFetchToken(user.token)
-        } catch (_: Exception) {
-            println("User did not bind fish account.")
-            ""
-        }
+        user.fishToken =
+            try {
+                CFQServer.fishFetchToken(user.token)
+            } catch (_: Exception) {
+                println("User did not bind fish account.")
+                ""
+            }
         println("Fetched user fish token: ${user.fishToken}")
 
-        user.fishForward = try {
-            CFQServer.apiFetchUserOption(user.token, "forwarding_fish") == "1"
-        } catch (_: Exception) {
-            println("User fish forward option failed to load, fallback to false")
-            false
-        }
+        user.fishForward =
+            try {
+                CFQServer.apiFetchUserOption(user.token, "forwarding_fish") == "1"
+            } catch (_: Exception) {
+                println("User fish forward option failed to load, fallback to false")
+                false
+            }
         println("Fetched user fish forward option: ${user.fishForward}")
 
-        user.bindQQ = try {
-            CFQServer.apiFetchUserOption(user.token, "bindQQ")
-        } catch (_: Exception) {
-            println("User did not bind qq.")
-            ""
-        }
+        user.bindQQ =
+            try {
+                CFQServer.apiFetchUserOption(user.token, "bindQQ")
+            } catch (_: Exception) {
+                println("User did not bind qq.")
+                ""
+            }
         println("Fetched user bind qq: ${user.bindQQ}")
     }
 
@@ -174,7 +185,7 @@ class LoginViewModel(
         viewModelScope.launch {
             _loginState.update {
                 it.copy(
-                    loginPrompt = newPrompt
+                    loginPrompt = newPrompt,
                 )
             }
         }

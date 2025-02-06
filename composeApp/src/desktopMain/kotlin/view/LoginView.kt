@@ -45,9 +45,10 @@ fun LoginView() {
     val repository = AppSettingsRepository(dataStore = LocalDataStore.current)
     val appState = LocalAppState.current
 
-    val model: LoginViewModel = viewModel {
-        LoginViewModel(repository)
-    }
+    val model: LoginViewModel =
+        viewModel {
+            LoginViewModel(repository)
+        }
 
     val loginState by model.loginState.collectAsState()
     val toaster = rememberToasterState()
@@ -72,19 +73,19 @@ fun LoginView() {
         }
     }
 
-
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Image(
             painter = painterResource(Res.drawable.app_icon),
             contentDescription = "App Icon",
-            modifier = Modifier
-                .padding(bottom = 20.dp)
-                .clip(RoundedCornerShape(10.dp))
-                .size(128.dp)
+            modifier =
+                Modifier
+                    .padding(bottom = 20.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .size(128.dp),
         )
         AnimatedVisibility(!loginState.isLoggingIn) {
             LoginComponent(toaster)
@@ -104,14 +105,14 @@ fun LoadingComponent() {
 
     Column(
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         CircularProgressIndicator(
-            modifier = Modifier.size(48.dp)
+            modifier = Modifier.size(48.dp),
         )
         Text(
             text = loginState.loginPrompt,
-            modifier = Modifier.padding(vertical = 20.dp)
+            modifier = Modifier.padding(vertical = 20.dp),
         )
     }
 }
@@ -140,13 +141,13 @@ fun LoginComponent(toaster: ToasterState) {
 
     Column(
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
             "登录到查分器",
             fontWeight = FontWeight.Bold,
             fontSize = 24.sp,
-            modifier = Modifier.padding(top = 20.dp)
+            modifier = Modifier.padding(top = 20.dp),
         )
         TextField(
             value = username,
@@ -160,12 +161,12 @@ fun LoginComponent(toaster: ToasterState) {
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Outlined.AccountCircle,
-                    contentDescription = "Username input field icon"
+                    contentDescription = "Username input field icon",
                 )
             },
             isError = loginState.isCredentialsMismatched,
             singleLine = true,
-            modifier = Modifier.padding(top = 40.dp)
+            modifier = Modifier.padding(top = 40.dp),
         )
         TextField(
             value = password,
@@ -179,45 +180,48 @@ fun LoginComponent(toaster: ToasterState) {
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Outlined.Key,
-                    contentDescription = "Password input field icon"
+                    contentDescription = "Password input field icon",
                 )
             },
             trailingIcon = {
                 Icon(
                     imageVector = if (passwordVisible) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility,
                     contentDescription = "Password visibility toggle button",
-                    modifier = Modifier.clickable {
-                        passwordVisible = !passwordVisible
-                    }
+                    modifier =
+                        Modifier.clickable {
+                            passwordVisible = !passwordVisible
+                        },
                 )
             },
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             isError = loginState.isCredentialsMismatched,
             singleLine = true,
             modifier = Modifier.padding(top = 10.dp),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    model.login(username, password.sha256())
-                }
-            ),
-            keyboardOptions = KeyboardOptions(
-                autoCorrect = false,
-                keyboardType = KeyboardType.Password,
-                imeAction = ImeAction.Done
-            )
+            keyboardActions =
+                KeyboardActions(
+                    onDone = {
+                        model.login(username, password.sha256())
+                    },
+                ),
+            keyboardOptions =
+                KeyboardOptions(
+                    autoCorrect = false,
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Done,
+                ),
         )
         Button(
             onClick = {
                 model.login(username, password.sha256())
             },
-            modifier = Modifier.padding(top = 20.dp)
+            modifier = Modifier.padding(top = 20.dp),
         ) {
             Text("登录")
         }
         TextButton(
             onClick = {
                 toaster.show(message = "请使用iOS或Android客户端注册账号", type = ToastType.Info)
-            }
+            },
         ) {
             Text("注册新账号")
         }

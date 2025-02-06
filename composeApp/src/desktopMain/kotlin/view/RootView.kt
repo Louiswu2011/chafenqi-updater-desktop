@@ -15,7 +15,4 @@ fun RootView() {
             LoginView()
         }
     }
-
-
 }
-

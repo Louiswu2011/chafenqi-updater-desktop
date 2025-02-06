@@ -16,7 +16,7 @@ import user.CFQUser
 import util.SystemProxy
 
 data class HomeViewState(
-    val isProxyOn: Boolean = false
+    val isProxyOn: Boolean = false,
 )
 
 class HomeViewModel : ViewModel() {
@@ -35,7 +35,7 @@ class HomeViewModel : ViewModel() {
                 viewModelScope.launch {
                     _homeState.update {
                         it.copy(
-                            isProxyOn = true
+                            isProxyOn = true,
                         )
                     }
                 }
@@ -44,7 +44,7 @@ class HomeViewModel : ViewModel() {
                 viewModelScope.launch {
                     _homeState.update {
                         it.copy(
-                            isProxyOn = false
+                            isProxyOn = false,
                         )
                     }
                 }
@@ -53,18 +53,23 @@ class HomeViewModel : ViewModel() {
             viewModelScope.launch {
                 _homeState.update {
                     it.copy(
-                        isProxyOn = false
+                        isProxyOn = false,
                     )
                 }
             }
         }
     }
 
-    fun copyToClipboard(game: Int, clipboardManager: ClipboardManager) {
+    fun copyToClipboard(
+        game: Int,
+        clipboardManager: ClipboardManager,
+    ) {
         val url = buildUrl(game)
-        clipboardManager.setText(buildAnnotatedString {
-            append(url)
-        })
+        clipboardManager.setText(
+            buildAnnotatedString {
+                append(url)
+            },
+        )
     }
 
     private fun buildUrl(game: Int): String {
@@ -72,6 +77,6 @@ class HomeViewModel : ViewModel() {
         if (token.isEmpty()) {
             return ""
         }
-        return "${PORTAL_ADDRESS}${if (game == 0) "upload_chunithm" else "upload_maimai"}?jwt=${token}"
+        return "${PORTAL_ADDRESS}${if (game == 0) "upload_chunithm" else "upload_maimai"}?jwt=$token"
     }
 }
