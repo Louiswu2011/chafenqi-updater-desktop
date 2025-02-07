@@ -20,7 +20,7 @@ data class SettingsUiState(
     val loadingSettings: Boolean = false,
     val validatingFishCredentials: Boolean = false,
     val fishCredentialsMismatch: Boolean = false,
-    val fishBindSuccess: Boolean = false
+    val fishBindSuccess: Boolean = false,
 )
 
 class SettingsViewModel : ViewModel() {
@@ -36,19 +36,20 @@ class SettingsViewModel : ViewModel() {
         viewModelScope.launch {
             _uiState.update {
                 it.copy(
-                    loadingSettings = true
+                    loadingSettings = true,
                 )
             }
-            user.fishForward = try {
-                CFQServer.apiFetchUserOption(user.token, "forwarding_fish") == "1"
-            } catch (e: Exception) {
-                println("User fish forward option failed to load, fallback to false")
-                false
-            }
+            user.fishForward =
+                try {
+                    CFQServer.apiFetchUserOption(user.token, "forwarding_fish") == "1"
+                } catch (e: Exception) {
+                    println("User fish forward option failed to load, fallback to false")
+                    false
+                }
             println("Fetched user fish forward option: ${user.fishForward}")
             _uiState.update {
                 it.copy(
-                    loadingSettings = false
+                    loadingSettings = false,
                 )
             }
         }
@@ -58,31 +59,34 @@ class SettingsViewModel : ViewModel() {
         viewModelScope.launch {
             _uiState.update {
                 it.copy(
-                    loadingSettings = true
+                    loadingSettings = true,
                 )
             }
             CFQServer.apiUploadUserOption(user.token, "forwarding_fish", if (state) "1" else "0")
             loadFishForward()
             _uiState.update {
                 it.copy(
-                    loadingSettings = false
+                    loadingSettings = false,
                 )
             }
         }
     }
 
-    fun validateFishCredentials(username: String, password: String) {
+    fun validateFishCredentials(
+        username: String,
+        password: String,
+    ) {
         viewModelScope.launch {
             _uiState.update {
                 it.copy(
-                    validatingFishCredentials = true
+                    validatingFishCredentials = true,
                 )
             }
             val token = FishServer.getUserToken(username, password)
             if (token.isEmpty()) {
                 _uiState.update {
                     it.copy(
-                        fishCredentialsMismatch = true
+                        fishCredentialsMismatch = true,
                     )
                 }
             } else {
@@ -92,7 +96,7 @@ class SettingsViewModel : ViewModel() {
             }
             _uiState.update {
                 it.copy(
-                    validatingFishCredentials = false
+                    validatingFishCredentials = false,
                 )
             }
         }
@@ -108,7 +112,7 @@ class SettingsViewModel : ViewModel() {
             viewModelScope.launch {
                 _uiState.update {
                     it.copy(
-                        fishCredentialsMismatch = false
+                        fishCredentialsMismatch = false,
                     )
                 }
             }
@@ -119,7 +123,7 @@ class SettingsViewModel : ViewModel() {
         viewModelScope.launch {
             _uiState.update {
                 it.copy(
-                    fishBindSuccess = true
+                    fishBindSuccess = true,
                 )
             }
         }
@@ -131,7 +135,7 @@ class SettingsViewModel : ViewModel() {
                 it.copy(
                     fishBindSuccess = false,
                     fishCredentialsMismatch = false,
-                    validatingFishCredentials = false
+                    validatingFishCredentials = false,
                 )
             }
         }
@@ -140,7 +144,7 @@ class SettingsViewModel : ViewModel() {
     fun submitQQ(qq: String) {
         viewModelScope.launch {
             user.bindQQ = qq
-            CFQServer.apiUploadUserOption(user.token, "bindQQ", qq)
+            CFQServer.apiUpdateBindQQ(user.token, qq)
         }
     }
 

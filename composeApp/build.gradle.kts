@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
+    kotlin("plugin.serialization") version "2.1.0"
 }
 
 val ktorVersion = "3.0.3"
@@ -29,6 +30,8 @@ kotlin {
             implementation("androidx.datastore:datastore:1.1.1")
             implementation("androidx.datastore:datastore-preferences:1.1.1")
             implementation("androidx.datastore:datastore-preferences-core:1.1.1")
+            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")
+            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
@@ -52,7 +55,7 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Exe, TargetFormat.Deb)
             modules("java.instrument", "java.management", "jdk.unsupported")
             packageName = "Chafenqi Updater"
-            packageVersion = "1.0.1"
+            packageVersion = "1.1.0"
             vendor = "NLTV"
 
             windows {

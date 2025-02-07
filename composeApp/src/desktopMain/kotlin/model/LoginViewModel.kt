@@ -2,6 +2,7 @@ package model
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import user.CFQUser
@@ -36,8 +37,16 @@ class LoginViewModel(
                 )
             }
 
-            try {
-                CFQUser.token = CFQServer.authenticate(username, password)
+            val (response, code) = CFQServer.authenticate(username, password)
+            if (code != HttpStatusCode.OK) {
+                raiseError("登录失败，请检查用户名或密码")
+                _loginState.update {
+                    it.copy(
+                        isLoggingIn = false,
+                    )
+                }
+            } else {
+                CFQUser.token = response
                 CFQUser.username = username
                 createUserProfile()
                 saveCredentialsToCache(username, CFQUser.token)
@@ -45,16 +54,6 @@ class LoginViewModel(
                     it.copy(
                         loginSuccess = true,
                     )
-                }
-            } catch (e: Exception) {
-                when (e) {
-                    is CredentialsMismatchException, is UserNotFoundException -> {
-                        raiseError("用户名或密码错误！")
-                    }
-
-                    else -> {
-                        raiseError("未知错误：$e")
-                    }
                 }
             }
 
@@ -151,7 +150,7 @@ class LoginViewModel(
 
     private suspend fun createUserProfile() {
         updatePrompt("加载用户数据...")
-        user.isPremium = CFQServer.apiIsPremium(user.username)
+        user.isPremium = CFQServer.apiIsPremium(user.token)
 
         user.fishToken =
             try {
@@ -173,7 +172,7 @@ class LoginViewModel(
 
         user.bindQQ =
             try {
-                CFQServer.apiFetchUserOption(user.token, "bindQQ")
+                CFQServer.apiFetchBindQQ(user.token)
             } catch (_: Exception) {
                 println("User did not bind qq.")
                 ""

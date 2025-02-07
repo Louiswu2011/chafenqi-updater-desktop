@@ -18,7 +18,7 @@ import user.LocalDataStore
 import util.CFQServer
 import view.RootView
 
-const val PORTAL_ADDRESS = "http://43.139.107.206:8083/"
+const val PORTAL_ADDRESS = "http://43.139.107.206:9030/"
 const val GITHUB_PREFIX = "https://github.com/Louiswu2011/"
 
 fun main() =

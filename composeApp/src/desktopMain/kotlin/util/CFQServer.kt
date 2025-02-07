@@ -7,6 +7,9 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
+import kotlinx.datetime.Clock
+import kotlinx.serialization.json.Json
+import user.CFQUserInfo
 
 object CFQServer {
     val client =
@@ -20,19 +23,22 @@ object CFQServer {
         client.close()
     }
 
+    private val decoder = Json { ignoreUnknownKeys = true }
+
+    private const val SERVER_ADDRESS = "http://43.139.107.206:8998"
+
     private suspend fun fetchFromServer(
         method: String,
         path: String,
         payload: HashMap<String, Any>? = null,
         queries: Map<String, String>? = null,
         token: String? = null,
-        shouldHandleErrorCode: Boolean = true,
     ): HttpResponse {
         val response: HttpResponse
         when (method) {
             "GET" -> {
                 response =
-                    client.get("http://43.139.107.206:8083/$path") {
+                    client.get("$SERVER_ADDRESS/$path") {
                         accept(ContentType.Any)
                         queries?.also { q ->
                             url { u ->
@@ -49,7 +55,7 @@ object CFQServer {
 
             "POST" -> {
                 response =
-                    client.post("http://43.139.107.206:8083/$path") {
+                    client.post("$SERVER_ADDRESS/$path") {
                         accept(ContentType.Any)
                         payload?.also {
                             this.contentType(ContentType.Application.Json)
@@ -61,12 +67,26 @@ object CFQServer {
                     }
             }
 
+            "DELETE" -> {
+                response =
+                    client.delete("$SERVER_ADDRESS/$path") {
+                        accept(ContentType.Any)
+                        queries?.also { q ->
+                            url { u ->
+                                q.forEach {
+                                    u.parameters.append(it.key, it.value)
+                                }
+                            }
+                        }
+                        token?.also {
+                            this.headers.append("Authorization", "Bearer $it")
+                        }
+                    }
+            }
+
             else -> {
                 throw Exception("Method not supported.")
             }
-        }
-        if (response.status.value != 200 && shouldHandleErrorCode) {
-            handleErrorCode(response.bodyAsText())
         }
         return response
     }
@@ -74,64 +94,57 @@ object CFQServer {
     suspend fun authenticate(
         username: String,
         password: String,
-    ): String {
+    ): Pair<String, HttpStatusCode> {
         val response =
             fetchFromServer(
                 "POST",
-                "api/auth",
+                "api/auth/login",
                 payload =
                     hashMapOf(
                         "username" to username,
                         "password" to password,
                     ),
             )
-        val errorCode = response.bodyAsText()
-        val header = response.headers["Authorization"]?.substring(7)
-
-        return header ?: ""
+        return response.bodyAsText() to response.status
     }
 
-    suspend fun apiIsPremium(username: String): Boolean {
+    suspend fun apiIsPremium(authToken: String): Boolean {
         val response =
             fetchFromServer(
-                "POST",
-                "api/isPremium",
-                payload =
-                    hashMapOf(
-                        "username" to username,
-                    ),
-                shouldHandleErrorCode = false,
+                "GET",
+                "api/user/info",
+                token = authToken,
             )
-        return response.status.value == 200
+        val info = decoder.decodeFromString<CFQUserInfo>(response.bodyAsText())
+        return info.premiumUntil >= Clock.System.now().epochSeconds
     }
 
-    suspend fun apiCheckPremiumTime(username: String): Double =
+    suspend fun apiCheckPremiumTime(authToken: String): Long =
         try {
             val response =
                 fetchFromServer(
                     "POST",
-                    "api/premiumTime",
-                    payload =
-                        hashMapOf(
-                            "username" to username,
-                        ),
+                    "api/user/info",
+                    token = authToken,
                 )
-            response.bodyAsText().toDouble()
+            val info = decoder.decodeFromString<CFQUserInfo>(response.bodyAsText())
+            info.premiumUntil
         } catch (e: Exception) {
-            0.0
+            0L
         }
 
     suspend fun apiFetchUserOption(
-        token: String,
+        authToken: String,
         param: String,
+        type: String = "string",
     ): String =
         try {
             val response =
                 fetchFromServer(
                     "GET",
-                    "api/user/option",
-                    token = token,
-                    queries = mapOf("param" to param),
+                    "api/user/properties",
+                    token = authToken,
+                    queries = mapOf("param" to param, "type" to type),
                 )
             response.bodyAsText()
         } catch (e: Exception) {
@@ -147,10 +160,10 @@ object CFQServer {
             val response =
                 fetchFromServer(
                     "POST",
-                    "api/user/option",
+                    "api/user/properties",
                     payload =
                         hashMapOf(
-                            "param" to param,
+                            "property" to param,
                             "value" to value,
                         ),
                     token = token,
@@ -160,52 +173,42 @@ object CFQServer {
             false
         }
 
-    suspend fun fishFetchToken(authToken: String) =
-        fetchFromServer(
-            "GET",
-            "fish/fetch_token",
-            token = authToken,
-        ).bodyAsText()
+    suspend fun fishFetchToken(authToken: String) = apiFetchUserOption(authToken, "fish_token")
 
     suspend fun fishUploadToken(
         authToken: String,
         fishToken: String,
-    ): Boolean {
-        val response =
-            fetchFromServer(
-                "POST",
-                "fish/upload_token",
-                payload =
-                    hashMapOf(
-                        "token" to fishToken,
-                    ),
-                token = authToken,
-            )
-        return response.status.value == 200
+    ): Boolean = apiUploadUserOption(authToken, "fish_token", fishToken)
+
+    suspend fun apiFetchBindQQ(authToken: String): String {
+        try {
+            val response =
+                fetchFromServer(
+                    "GET",
+                    "api/user/bind",
+                    token = authToken,
+                )
+            return response.bodyAsText()
+        } catch (_: Exception) {
+            return ""
+        }
     }
 
-    private fun handleErrorCode(errorCode: String) {
-        when (errorCode) {
-            "MISMATCH" -> throw CredentialsMismatchException()
-            "INVALID" -> throw InvalidTokenException()
-            "NOT FOUND" -> throw UserNotFoundException()
-            "EMPTY" -> throw EmptyUserDataException()
-            "NOT UNIQUE" -> throw UsernameOccupiedException()
-            else -> throw CFQServerSideException(errorCode = errorCode)
+    suspend fun apiUpdateBindQQ(
+        authToken: String,
+        qq: String,
+    ): Boolean {
+        try {
+            val response =
+                fetchFromServer(
+                    "POST",
+                    "api/user/bind",
+                    payload = hashMapOf("qq" to qq),
+                    token = authToken,
+                )
+            return response.status == HttpStatusCode.OK
+        } catch (_: Exception) {
+            return false
         }
     }
 }
-
-class CredentialsMismatchException : Exception()
-
-class InvalidTokenException : Exception()
-
-class UserNotFoundException : Exception()
-
-class EmptyUserDataException : Exception()
-
-class UsernameOccupiedException : Exception()
-
-class CFQServerSideException(
-    errorCode: String,
-) : Exception(errorCode)

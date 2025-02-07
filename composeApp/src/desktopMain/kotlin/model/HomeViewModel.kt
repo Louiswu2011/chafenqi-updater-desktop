@@ -77,6 +77,6 @@ class HomeViewModel : ViewModel() {
         if (token.isEmpty()) {
             return ""
         }
-        return "${PORTAL_ADDRESS}${if (game == 0) "upload_chunithm" else "upload_maimai"}?jwt=$token"
+        return "${PORTAL_ADDRESS}${if (game == 0) "upload/chunithm" else "upload/maimai"}?jwt=$token"
     }
 }
